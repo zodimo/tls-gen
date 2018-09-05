@@ -1,7 +1,7 @@
- have created a docker Image that will clone the master repo of [michaelklishin/tls-gen](https://github.com/michaelklishin/tls-gen).
+I have created a docker Image that will clone the master repo of [michaelklishin/tls-gen](https://github.com/michaelklishin/tls-gen).
 The following environment variables are available:
 
-###For the Setup:
+### For the Setup:
 GEN_TYPE : Possible values : basic or separate_intermediates or separate_intermediates as the build options in the tls-gen repo
 e.g `-e GEN_TYPE basic`
 
@@ -25,18 +25,18 @@ e.g `-e SERVER_KEY_PEM server_key.pem`
 SERVER_KEY_P12 : name and path ( relative to OUTPUTDIR or full path ) , default : server_key.p12
 e.g `-e SERVER_KEY_P12 server_key.p12`
 
-#####The following two option is only relevant with -e GEN_TYPE separate_intermediates
+##### The following two option is only relevant with -e GEN_TYPE separate_intermediates
 
 CHAINED_CLIENT_CA_CERTIFICATE : name and path ( relative to OUTPUTDIR or full path ) , default :chained_client_ca_certificate.pem
 e.g `-e CHAINED_CLIENT_CA_CERTIFICATE chained_client_ca_certificate.pem`
 CHAINED_SERVER_CA_CERTIFICATE : name and path ( relative to OUTPUTDIR or full path ) , default : chained_server_ca_certificate.pem
 e.g `-e CHAINED_SERVER_CA_CERTIFICATE chained_server_ca_certificate.pem`
 
-#####The following option is only relevant with -e GEN_TYPE two_shared_intermediates
+##### The following option is only relevant with -e GEN_TYPE two_shared_intermediates
 ENV CHAINED_CA_CERTIFICATE : name and path ( relative to OUTPUTDIR or full path ) , default : chained_ca_certificate.pem
 e.g `-e CHAINED_CA_CERTIFICATE chained_ca_certificate.pem`
 
-###For the "Make" process :
+### For the "Make" process :
 
 CN : Default is $(shell hostname)
 CLIENT_ALT_NAME : Default is $(shell hostname)
@@ -50,7 +50,7 @@ REGEN : Default is true
 
 for more options check out https://github.com/michaelklishin/tls-gen
 
-###Example :
+### Example :
 `
 docker container run --rm -v $(pwd):/opt/output -e GEN_TYPE=two_shared_intermediates zodimo/tls-gen
 `
