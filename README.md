@@ -47,7 +47,7 @@ Defaults as defined in the respective make files.
 | PASSWORD | '' |
 | REGEN | true |
 
-for more options check out https://github.com/michaelklishin/tls-gen
+for more options check out [michaelklishin/tls-gen](https://github.com/michaelklishin/tls-gen)
 
 ### Example :
 `
