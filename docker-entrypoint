@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+
+declare -A env_defaults=(
+['GEN_TYPE']="basic"
+['REGEN']=true
+['OUTPUTDIR']='/opt/output'
+)
+
+declare -A files=(
+['CA_CERTIFICATE']="ca_certificate.pem"
+['CA_KEY']="ca_key.pem"
+['CLIENT_CERTIFICATE']="client_certificate.pem"
+['CLIENT_KEY_PEM']="client_key.pem"
+['CLIENT_KEY_P12']="client_key.p12"
+['SERVER_CERTIFICATE']="server_certificate.pem"
+['SERVER_KEY_PEM']="server_key.pem"
+['SERVER_KEY_P12']="server_key.p12"
+['CHAINED_CLIENT_CA_CERTIFICATE']="chained_client_ca_certificate.pem"
+['CHAINED_SERVER_CA_CERTIFICATE']="chained_server_ca_certificate.pem"
+['CHAINED_CA_CERTIFICATE']="chained_ca_certificate.pem"
+)
+
+function getEnv(){
+    if [ -z ${!1} ] || [ ${!1} == "" ]; then
+        echo "${env_defaults[${1}]}"
+    else
+        echo ${!1}
+    fi
+}
+
+function getEnvFile(){
+ if [ -z ${!1} ] || [ ${!1} == "" ]; then
+        echo "${files[${1}]}"
+    else
+        echo ${!1}
+    fi
+
+}
+
+src=/usr/src/tls-gen
+result_dir=${src}/${GEN_TYPE}/result
+make_params=(
+CN
+CLIENT_ALT_NAME
+SERVER_ALT_NAME
+NUMBER_OF_PRIVATE_KEY_BITS
+DAYS_OF_VALIDITY
+ECC_CURVE
+USE_ECC
+PASSWORD
+)
+
+make_args=()
+
+for arg in ${make_params[@]}; do
+    if [ ! -z ${!arg} ]; then
+        make_args+=("${arg}=${!arg}")
+    fi
+done
+
+cd ${src}
+
+if [ -d ${GEN_TYPE} ]; then
+    cd ${GEN_TYPE}
+    if [[ ${REGEN} == 'true' ]] ||  [[ ${REGEN} -eq 1 ]]; then
+        REGEN=1
+        make regen ${make_args[@]}
+    else
+        make ${make_args[@]}
+    fi
+else
+    echo "GEN_TYPE : ${GEN_TYPE} , not a valid options"
+    exit 1
+fi
+
+#Create output directory
+if [ ! -d $(getEnv OUTPUTDIR) ]; then
+    mkdir -p $(getEnv OUTPUTDIR)
+fi
+
+
+for file_var in "${!files[@]}"; do
+    src_file=${result_dir}/${files[$file_var]}
+    dst_file=$(getEnvFile ${file_var})
+
+    if [ -f ${src_file} ]; then
+
+        cd $(getEnv OUTPUTDIR)
+        dst_file_path=$(dirname ${dst_file})
+        dst_file=$(basename ${dst_file})
+        if [ ! -d ${dst_file_path} ]; then
+            mkdir -p ${dst_file_path}
+            chmod 775 ${dst_file_path}
+        fi
+        cd ${dst_file_path}
+        echo "scp ${src_file} $(pwd)/${dst_file}"
+        scp ${src_file} ${dst_file}
+        chmod 644 ${dst_file}
+    fi
+
+done
+
+exec "$@"
+
+
+
+
+
+
+
